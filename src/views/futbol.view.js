@@ -16,6 +16,7 @@ class FutbolView {
 
     for (const player of this.players) {
       const playerDiv = document.createElement('div');
+      playerDiv.onclick = () => console.log(JSON.stringify(player));
 
       const nameElement = document.createElement('span');
       nameElement.textContent = `Player name: ${player.name}`;
