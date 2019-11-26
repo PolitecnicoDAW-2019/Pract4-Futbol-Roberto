@@ -5,13 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Pract4-Futbol</title>
+    <style>
+      .playerCard {
+        margin-left: 3em;
+        padding: 0 1.4em;
+        display: inline-block;
+        text-align: center;
+        border: 1px solid green;
+        color: white;
+      }
+
+      .playerCard > img {
+        margin: 0 auto;
+      }
+
+      .split {
+        height: 100%;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        overflow-x: hidden;
+        padding-top: 20px;
+      }
+
+      .left {
+        left: 0;
+        background-color: #111;
+        width: 70%;
+      }
+
+      .right {
+        right: 0;
+        background-color: red;
+        width: 30%;
+      }
+    </style>
   </head>
   <body>
     <h1>PRACTICA4</h1>
-    <div id="cardsPanel"></div>
+    <div id="cardsPanel" class="split left"></div>
+    <aside id="controlPanel" class="split right">
+      <div><button id="closeButton">Close</button></div>
+      <div>
+        <form>
+          <img
+            id="playerPicture"
+            width="100px"
+            src="http://i.imgur.com/JQeO2Wj.jpg"
+          />
+          <label>Name: </label><input name="name" type="text" /><br />
+          <label>Alias: </label><input name="alias" type="text" /><br />
+          <label>Position: </label
+          ><select name="position" id="selectPositions"></select>
+        </form>
+        <div id="panelButtons"></div>
+      </div>
+    </aside>
   </body>
   <script src="./services/http.service.js"></script>
-  <script src="./services/user.service.js"></script>
+  <script src="./services/player.service.js"></script>
   <script src="./views/futbol.view.js"></script>
   <script src="./controllers/futbol.controller.js"></script>
   <script src="./app.js"></script>
