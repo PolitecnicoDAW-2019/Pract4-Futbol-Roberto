@@ -6,12 +6,14 @@ class FutbolController {
 
     this.view.bindLoadPositions(this.handlerDoHttpRequest);
     this.loadUsers().then(response => {
-      this.view.players = response;
-      this.playerService = response;
-
-      this.view.createCards();
+      this.view.createCards(response);
+      this.playerService.players = response;
     });
+
+    this.view.bindManagePlayer(this.handlerManagePlayer);
   }
+
+  handlerManagePlayer = player => this.playerService.managePlayer(player);
 
   handlerDoHttpRequest = requestParameters =>
     this.httpService.makeRequest(requestParameters);
