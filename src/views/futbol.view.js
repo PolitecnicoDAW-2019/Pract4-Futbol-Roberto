@@ -113,7 +113,7 @@ class FutbolView {
   constructAddContent = user => {
     const addButton = document.createElement('button');
     addButton.textContent = 'Add Player';
-    addButton.onclick = () => console.log('working!');
+    addButton.onclick = () => this.createPlayer(user);
     this.DOM.panelButtons.appendChild(addButton);
   };
 
@@ -150,6 +150,17 @@ class FutbolView {
     }
     const select = this.DOM.selectPositions;
     player.position = select.options[select.selectedIndex].text;
+    this.managePlayer(player).then(response => this.createCards(response));
+  };
+
+  createPlayer = player => {
+    const inputs = this.DOM.formPlayer.getElementsByTagName('input');
+    for (const input of inputs) {
+      player[input.name] = input.value;
+    }
+    const select = this.DOM.selectPositions;
+    player.position = select.options[select.selectedIndex].text;
+    player.picture = this.DOM.playerPicture.src;
     this.managePlayer(player).then(response => this.createCards(response));
   };
 

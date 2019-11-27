@@ -8,7 +8,21 @@ class PlayerService {
       : this.createPlayer(comingPlayer);
   };
 
-  createPlayer = player => {};
+  createPlayer = player => {
+    return this.makeRequest({
+      url: 'http://localhost/server/createPlayer.php',
+      method: 'POST',
+      body: player
+    })
+      .then(response => {
+        console.log(response);
+        this.players.push(player);
+        return this.players;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
   updatePlayer = (oldPlayer, updatedPlayer) => {
     const playerBackup = { ...oldPlayer };
     oldPlayer.alias = updatedPlayer.alias;

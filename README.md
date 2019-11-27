@@ -3,7 +3,7 @@
 ## Todo
 
 - [x] Cleanup user info panel
-- [ ] Add user to DB
+- [x] Add user to DB
 - [x] Edit user data
 - [ ] Remove user data
 - [ ] Give style to "add card"
@@ -11,3 +11,4 @@
 - [ ] Refactor httpService
 - [ ] Change birthdate to age inside cards
 - [ ] Load user info into the panel !!!
+- [ ] Fix problem with pictures
