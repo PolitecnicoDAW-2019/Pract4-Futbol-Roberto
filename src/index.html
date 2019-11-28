@@ -15,8 +15,35 @@
         color: white;
       }
 
+      .playerCard:hover {
+        background-color: rgba(82, 15, 37, 0.534);
+      }
+
       .playerCard > img {
         margin: 0 auto;
+      }
+
+      .formPlayer {
+        text-align: center;
+      }
+
+      .formPlayer img {
+        margin-bottom: 1em;
+      }
+
+      #panelButtons {
+        margin-top: 2.2em;
+        text-align: center;
+      }
+
+      #panelButtons > button {
+        margin: 1em
+      }
+
+      #controlPanel div:first-child {
+        text-align: right;
+        margin-right: 0.5em;
+        margin-bottom: 0.5em;
       }
 
       .split {
@@ -46,10 +73,10 @@
     <aside id="controlPanel" class="split right">
       <div><button id="closeButton">Close</button></div>
       <div>
-        <form id="formPlayer">
+        <form id="formPlayer" class="formPlayer">
           <img
             id="playerPicture"
-            width="100px"
+            width="300px"
             src="https://www.notesmate.in/images/default-user.png"
           /><br />
           <label>Name: </label><input name="name" type="text" /><br />
@@ -63,7 +90,7 @@
       </div>
     </aside>
   </body>
-  <script src="./services/http.service.js"></script>
+  <script src="./server/moment.min.js"></script>
   <script src="./services/player.service.js"></script>
   <script src="./views/futbol.view.js"></script>
   <script src="./controllers/futbol.controller.js"></script>

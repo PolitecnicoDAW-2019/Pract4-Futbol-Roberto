@@ -1,7 +1,6 @@
 class FutbolController {
-  constructor(_view, _httpService, _userService) {
+  constructor(_view, _userService) {
     this.view = _view;
-    this.httpService = _httpService;
     this.playerService = _userService;
 
     this.view.bindLoadPositions(this.handlerDoHttpRequest);
@@ -11,15 +10,20 @@ class FutbolController {
     });
 
     this.view.bindManagePlayer(this.handlerManagePlayer);
+    this.view.bindDeletePlayer(this.handlerDeletePlayer);
   }
 
   handlerManagePlayer = player => this.playerService.managePlayer(player);
 
-  handlerDoHttpRequest = requestParameters =>
-    this.httpService.makeRequest(requestParameters);
+  handlerDeletePlayer = player => this.playerService.deletePlayer(player);
 
+  handlerDoHttpRequest = requestParameters =>
+    this.playerService.makeRequest(requestParameters);
+
+
+    //Move to playerService
   loadUsers = () => {
-    return this.httpService.makeRequest({
+    return this.playerService.makeRequest({
       url: 'http://localhost/server/retrievePlayers.php'
     });
   };

@@ -15,7 +15,7 @@ while ($player = $oConsulta->fetch_object()) {
         "name" => $player->NAME,
         "alias" => $player->ALIAS,
         "birthdate" => $player->BIRTHDATE,
-        "picture" => base64_encode($player->PICTURE),
+        "picture" => 'data:image/jpeg;base64,'.base64_encode($player->PICTURE),
         "club" => $player->CLUB,
         "position" => $player->DESCRIPTION
     ];

@@ -40,19 +40,21 @@ class FutbolView {
     playerDiv.onclick = () => this.manageControlPanel('edit', player);
     playerDiv.className = 'playerCard';
 
+    const age = moment().diff(player.birthdate, 'years');
+    
     const nameElement = document.createElement('p');
-    nameElement.textContent = `Player name: ${player.name}`;
+    nameElement.textContent = `Nombre: ${player.name}`;
     const aliasElement = document.createElement('p');
-    aliasElement.textContent = `Player alias: ${player.alias}`;
+    aliasElement.textContent = `Alias: ${player.alias}`;
     const birthDateElement = document.createElement('p');
-    birthDateElement.textContent = `Player Birth Date: ${player.birthdate}`;
+    birthDateElement.textContent = `Edad: ${age}`;
     const clubElement = document.createElement('p');
-    clubElement.textContent = `Player club: ${player.club}`;
+    clubElement.textContent = `Club: ${player.club}`;
     const positionElement = document.createElement('p');
-    positionElement.textContent = `Player position: ${player.position}`;
+    positionElement.textContent = `Posición: ${player.position}`;
     const imageElement = document.createElement('img');
-    imageElement.width = 100;
-    imageElement.src = `data:image/jpeg;base64,${player.picture}`;
+    imageElement.width = 150;
+    imageElement.src = player.picture;
 
     playerDiv.appendChild(imageElement);
     playerDiv.appendChild(nameElement);
@@ -118,13 +120,14 @@ class FutbolView {
   };
 
   constructEditContent = user => {
+    this.loadPlayerInfoIntoPanel(user);
     const saveButton = document.createElement('button');
     saveButton.textContent = 'Save';
     saveButton.onclick = () => this.updatePlayer(user);
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
-    deleteButton.onclick = () => console.log(user);
+    deleteButton.onclick = () => this.deletePlayer(user).then(response => this.createCards(response));
 
     this.DOM.panelButtons.appendChild(saveButton);
     this.DOM.panelButtons.appendChild(deleteButton);
@@ -143,6 +146,7 @@ class FutbolView {
 
   updatePlayer = player => {
     //do validation
+    console.log(player)
     const inputs = this.DOM.formPlayer.getElementsByTagName('input');
     for (const input of inputs) {
       player[input.name] =
@@ -150,7 +154,10 @@ class FutbolView {
     }
     const select = this.DOM.selectPositions;
     player.position = select.options[select.selectedIndex].text;
+    player.picture = this.DOM.playerPicture.src;
+    console.log(player) // Fix player picture
     this.managePlayer(player).then(response => this.createCards(response));
+    this.changeControlPanelVisibility('hidden');
   };
 
   createPlayer = player => {
@@ -162,7 +169,25 @@ class FutbolView {
     player.position = select.options[select.selectedIndex].text;
     player.picture = this.DOM.playerPicture.src;
     this.managePlayer(player).then(response => this.createCards(response));
+    this.changeControlPanelVisibility('hidden');
   };
 
+  bindDeletePlayer = handler => {
+    this.deletePlayer = (player) => {
+      handler(player).then(response => this.createCards(response));
+      this.changeControlPanelVisibility('hidden');
+    };
+  }
+
   bindManagePlayer = handler => (this.managePlayer = handler);
+
+  loadPlayerInfoIntoPanel = player => {
+    const inputs = this.DOM.formPlayer.getElementsByTagName('input');
+    for (const input of inputs) {
+      input.value = player[input.name]
+    }
+    const select = this.DOM.selectPositions;
+    select.options[select.selectedIndex].text = player.position
+    this.DOM.playerPicture.src = player.picture;
+  } 
 }

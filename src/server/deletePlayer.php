@@ -7,9 +7,8 @@ require_once __DIR__ . "/oConexion.class.php";
 $oConexion = new oConexion('mysql', 'docker', 'root', 'tiger');
 $oConexion->abrir();
 $oConni = $oConexion->obtenerConexion();
+$stmtDelete = $oConni->prepare("DELETE FROM PLAYERS WHERE ID = ?");
 
-$oConsulta = $oConni->query("SELECT * FROM POSITIONS");
-while ($position = $oConsulta->fetch_object()) {
-    $positions[$position->DESCRIPTION] = $position->ID;
-}
-echo json_encode($positions);
+$stmtDelete->bind_param('i', $_POST['userId']);
+$stmtDelete->execute();
+echo json_encode(["ESTATUS" => "OK"]);

@@ -47,9 +47,24 @@ class PlayerService {
       });
   };
 
-  removePlayer = player => {};
+  deletePlayer = player => {
+    const backupPlayers = [...this.players];
+    this.players = this.players.filter(({ id }) => id !== player.id);
 
-  makeRequest = ({ url, method = 'GET', body = {} }) => {
+    return this.makeRequest({
+      url: 'http://localhost/server/deletePlayer.php',
+      method: 'POST',
+      body: { userId: player.id }
+    }).then(response => {
+      console.log(response);
+      return this.players
+    }).catch(error => {
+      console.log(error);
+      this.players = backupPlayers;
+    })
+  };
+
+  makeRequest = ({ url, method = 'POST', body = {} }) => {
     const data = this.generateFormData(body);
     return fetch(url, {
       method: method,
