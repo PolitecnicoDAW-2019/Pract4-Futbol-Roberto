@@ -4,6 +4,16 @@ class FutbolView {
     this.DOM.closeButton.addEventListener('click', () =>
       this.changeControlPanelVisibility('hidden')
     );
+    this.DOM.pictureBase64.addEventListener('change', this.loadPictureFromInput)
+
+    this.DOM.inputName.addEventListener('keyup', this.manageValidations)
+    this.DOM.inputAlias.addEventListener('keyup', this.manageValidations)
+    this.DOM.inputClub.addEventListener('keyup', this.manageValidations)
+    this.validations = {
+      name: false,
+      alias: false,
+      club: false
+    }
   }
 
   DOM = {
@@ -13,7 +23,12 @@ class FutbolView {
     selectPositions: document.getElementById('selectPositions'),
     panelButtons: document.getElementById('panelButtons'),
     formPlayer: document.getElementById('formPlayer'),
-    playerPicture: document.getElementById('playerPicture')
+    playerPicture: document.getElementById('playerPicture'),
+    pictureBase64: document.getElementById('pictureBase64'),
+    searchPlayer: document.getElementById('searchPlayer'),
+    inputName: document.getElementById('inputName'),
+    inputAlias: document.getElementById('inputAlias'),
+    inputClub: document.getElementById('inputClub')
   };
 
   fillSelectPosition = positions => {
@@ -28,14 +43,50 @@ class FutbolView {
 
   bindLoadPositions = handler => {
     handler({
-      url: 'http://localhost/server/retrievePositions.php'
+      url: POSITIONS_URL
     }).then(response => {
       this.positions = response;
       this.fillSelectPosition(response);
     });
   };
 
+  bindValidateName = handler => this.validateName = handler;
+  bindValidateAlias = handler => this.validateAlias = handler;
+  bindValidateClub = handler => this.validateClub = handler;
+
+  manageValidations = event => {
+    const element = event.target;
+    const inputName = element.name;
+    const inputValue = element.value;
+
+    const validations = {
+      name: this.validateName,
+      alias: this.validateAlias,
+      club: this.validateClub
+    }
+    const validateOK = validations[inputName](inputValue);
+    this.validations[inputName] = validateOK;
+
+    const allValidationsOK = Object.values(this.validations).every(validation => validation)
+    this.enablePanelButtons(allValidationsOK);
+
+    const changeCheck = {
+      true: GREEN_TICK_URL,
+      false: RED_CROSS_URL
+    }
+    const imageURL = changeCheck[validateOK];
+    element.nextSibling.src = imageURL
+  }
+
+  enablePanelButtons = enable => {
+    for(const button of this.DOM.panelButtons.getElementsByTagName('button')) {
+      button.disabled = !enable;
+    }
+  }
+
   createCard = player => {
+    player.pictureBase64 = '';
+
     const playerDiv = document.createElement('div');
     playerDiv.onclick = () => this.manageControlPanel('edit', player);
     playerDiv.className = 'playerCard';
@@ -54,7 +105,7 @@ class FutbolView {
     positionElement.textContent = `Posición: ${player.position}`;
     const imageElement = document.createElement('img');
     imageElement.width = 150;
-    imageElement.src = player.picture;
+    imageElement.src = PROFILE_PICTURES_URL + player.picture;
 
     playerDiv.appendChild(imageElement);
     playerDiv.appendChild(nameElement);
@@ -66,11 +117,15 @@ class FutbolView {
     return playerDiv;
   };
 
-  createCards = players => {
+  loadCards = players => {
     this.DOM.cardsPanel.innerHTML = '';
-    for (const player of players) {
-      const card = this.createCard(player);
-      this.DOM.cardsPanel.appendChild(card);
+
+    //Improve
+    if(players){
+      for (const player of players) {
+        const card = this.createCard(player);
+        this.DOM.cardsPanel.appendChild(card);
+      }
     }
 
     const addPlayerCardDiv = document.createElement('div');
@@ -82,12 +137,12 @@ class FutbolView {
 
   setVisibilityToHidden = () => {
     this.DOM.controlPanel.style.width = 0;
-    this.DOM.cardsPanel.style.width = '100%';
+    this.DOM.cardsPanel.parentElement.style.width = '100%';
   };
 
   setVisibilityToShown = () => {
     this.DOM.controlPanel.style.width = '30%';
-    this.DOM.cardsPanel.style.width = '70%';
+    this.DOM.cardsPanel.parentElement.style.width = '70%';
   };
 
   changeControlPanelVisibility = visibility => {
@@ -107,7 +162,7 @@ class FutbolView {
 
     this.DOM.selectPositions.selectedIndex = 0;
     this.DOM.playerPicture.src =
-      'https://www.notesmate.in/images/default-user.png';
+    PROFILE_PICTURES_URL + DEFAULT_USER_ICON;
   };
 
   clearPanelButtons = () => (this.DOM.panelButtons.innerHTML = '');
@@ -127,7 +182,7 @@ class FutbolView {
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
-    deleteButton.onclick = () => this.deletePlayer(user).then(response => this.createCards(response));
+    deleteButton.onclick = () => this.deletePlayer(user).then(response => this.loadCards(response));
 
     this.DOM.panelButtons.appendChild(saveButton);
     this.DOM.panelButtons.appendChild(deleteButton);
@@ -145,8 +200,6 @@ class FutbolView {
   };
 
   updatePlayer = player => {
-    //do validation
-    console.log(player)
     const inputs = this.DOM.formPlayer.getElementsByTagName('input');
     for (const input of inputs) {
       player[input.name] =
@@ -155,10 +208,17 @@ class FutbolView {
     const select = this.DOM.selectPositions;
     player.position = select.options[select.selectedIndex].text;
     player.picture = this.DOM.playerPicture.src;
-    console.log(player) // Fix player picture
-    this.managePlayer(player).then(response => this.createCards(response));
+    console.log(player)
+    this.managePlayer(player).then(response => this.loadCards(response));
     this.changeControlPanelVisibility('hidden');
   };
+
+  loadPictureFromInput = () => {
+    const file = this.DOM.pictureBase64.files[0];
+    const fileReader = new FileReader();
+    fileReader.onload = () => this.DOM.playerPicture.src = fileReader.result;
+    fileReader.readAsDataURL(file);
+  }
 
   createPlayer = player => {
     const inputs = this.DOM.formPlayer.getElementsByTagName('input');
@@ -168,18 +228,23 @@ class FutbolView {
     const select = this.DOM.selectPositions;
     player.position = select.options[select.selectedIndex].text;
     player.picture = this.DOM.playerPicture.src;
-    this.managePlayer(player).then(response => this.createCards(response));
+    console.log(player)
+    this.managePlayer(player).then(response => this.loadCards(response));
     this.changeControlPanelVisibility('hidden');
   };
 
   bindDeletePlayer = handler => {
     this.deletePlayer = (player) => {
-      handler(player).then(response => this.createCards(response));
+      handler(player).then(response => this.loadCards(response));
       this.changeControlPanelVisibility('hidden');
     };
   }
 
   bindManagePlayer = handler => (this.managePlayer = handler);
+  bindSearchUser = handler => {
+    this.searchPlayer = event => handler(event).then(response => this.loadCards(response));
+    this.DOM.searchPlayer.addEventListener('keyup', this.searchPlayer);
+  }
 
   loadPlayerInfoIntoPanel = player => {
     const inputs = this.DOM.formPlayer.getElementsByTagName('input');
@@ -188,6 +253,6 @@ class FutbolView {
     }
     const select = this.DOM.selectPositions;
     select.options[select.selectedIndex].text = player.position
-    this.DOM.playerPicture.src = player.picture;
+    this.DOM.playerPicture.src = PROFILE_PICTURES_URL + player.picture;
   } 
 }

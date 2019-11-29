@@ -1,4 +1,5 @@
 const app = new FutbolController(
   new FutbolView(),
-  new PlayerService()
+  new PlayerService(),
+  new ValidationService()
 );

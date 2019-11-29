@@ -9,20 +9,23 @@ class PlayerService {
   };
 
   createPlayer = player => {
+    this.players.push(player);
     return this.makeRequest({
-      url: 'http://localhost/server/createPlayer.php',
+      url: CREATE_PLAYER_URL,
       method: 'POST',
       body: player
     })
       .then(response => {
         console.log(response);
-        this.players.push(player);
+        player.picture = response.pictureName
         return this.players;
       })
       .catch(error => {
         console.log(error);
+        return this.players;
       });
   };
+
   updatePlayer = (oldPlayer, updatedPlayer) => {
     const playerBackup = { ...oldPlayer };
     oldPlayer.alias = updatedPlayer.alias;
@@ -33,17 +36,19 @@ class PlayerService {
     oldPlayer.position = updatedPlayer.position;
 
     return this.makeRequest({
-      url: 'http://localhost/server/updatePlayer.php',
+      url: UPDATE_PLAYER_URL,
       method: 'POST',
       body: oldPlayer
     })
       .then(response => {
         console.log(response);
+        oldPlayer.picture = response.pictureName
         return this.players;
       })
       .catch(error => {
         console.log(error);
         oldPlayer = playerBackup;
+        return this.players;
       });
   };
 
@@ -52,7 +57,7 @@ class PlayerService {
     this.players = this.players.filter(({ id }) => id !== player.id);
 
     return this.makeRequest({
-      url: 'http://localhost/server/deletePlayer.php',
+      url: DELETE_PLAYER_URL,
       method: 'POST',
       body: { userId: player.id }
     }).then(response => {
@@ -61,8 +66,15 @@ class PlayerService {
     }).catch(error => {
       console.log(error);
       this.players = backupPlayers;
+      return this.players;
     })
   };
+
+  searchUser = event => {
+    const playerName = event.target.value;
+    console.log('playerName:',playerName);
+    return this.makeRequest({ url: SEARCH_PLAYER_URL, body: { name: playerName } })
+  }
 
   makeRequest = ({ url, method = 'POST', body = {} }) => {
     const data = this.generateFormData(body);

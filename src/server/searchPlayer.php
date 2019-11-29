@@ -4,13 +4,13 @@ ini_set('display_errors', 'on');
 ini_set('max_execution_time', 10);
 require_once __DIR__ . "/oConexion.class.php";
 
+$nombreJugador = $_POST['name'];
+
 $oConexion = new oConexion('mysql', 'docker', 'root', 'tiger');
 $oConexion->abrir();
-
 $oConni = $oConexion->obtenerConexion();
 
-$players = [];
-$oConsulta = $oConni->query("SELECT PLAYERS.ID, NAME, ALIAS, BIRTHDATE, PICTURE, CLUB,DESCRIPTION FROM PLAYERS INNER JOIN POSITIONS ON PLAYERS.ID_POSITION = POSITIONS.ID");
+$oConsulta = $oConni->query("SELECT PLAYERS.ID, NAME, ALIAS, BIRTHDATE, PICTURE, CLUB,DESCRIPTION FROM PLAYERS INNER JOIN POSITIONS ON PLAYERS.ID_POSITION = POSITIONS.ID WHERE NAME LIKE '%$nombreJugador%'");
 while ($player = $oConsulta->fetch_object()) {
     $players[] = [
         "id" => $player->ID,

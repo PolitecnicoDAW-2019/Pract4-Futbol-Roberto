@@ -3,6 +3,10 @@ ini_set('error_reporting', E_ALL ^ E_NOTICE ^ E_WARNING);
 ini_set('display_errors', 'on');
 ini_set('max_execution_time', 10);
 require_once __DIR__ . "/oConexion.class.php";
+$IMAGES_DIRECTORY = '../images/';
+
+$hashName = hash('sha256',$_POST['name']).'.png';
+file_put_contents($IMAGES_DIRECTORY.$hashName, base64_decode(explode(',',$_POST['picture'])[1]));
 
 $oConexion = new oConexion('mysql', 'docker', 'root', 'tiger');
 $oConexion->abrir();
@@ -17,7 +21,8 @@ $stmtPosition->store_result();
 $stmtPosition->bind_result($idPosicion);
 $stmtPosition->fetch();
 
-$stmtInsertion->bind_param('sssssii', $_POST['name'], $_POST['alias'], $_POST['birthdate'], $_POST['picture'], $_POST['club'], $idPosicion, $_POST['id']);
+
+$stmtInsertion->bind_param('sssssii', $_POST['name'], $_POST['alias'], $_POST['birthdate'], $hashName, $_POST['club'], $idPosicion, $_POST['id']);
 $stmtInsertion->execute();
 
-echo json_encode(["ESTATUS" => "OK"]);
+echo json_encode(["ESTATUS" => "OK", "pictureName" => $hashName]);
